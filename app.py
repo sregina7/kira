@@ -1,133 +1,128 @@
 import streamlit as st
-import urllib.parse, random, time
-from datetime import datetime
+import os, urllib.parse, random
 
-st.set_page_config(page_title="KIRA V15 - Final Foco", page_icon="💜", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="KIRA V15 • Preto e Dourado", page_icon="🦁", layout="centered")
 
+# CSS PREMIUM PRETO E DOURADO - CORRIGIDO
 st.markdown("""
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&display=swap');
-.stApp { background: radial-gradient(ellipse at top, #1f1630 0%, #0a0a0a 70%); }
-.kira-title { font-family:'Space Grotesk',sans-serif; font-size: clamp(2.2rem,8vw,3.8rem); font-weight:800; text-align:center; background: linear-gradient(90deg,#ff7ee2,#8ec5fc,#ffc857); -webkit-background-clip:text; -webkit-text-fill-color:transparent; letter-spacing:5px; }
-.kira-sub { text-align:center; color:#a89fbf; font-size:0.82rem; letter-spacing:3px; margin-top:-10px; }
-.stChatMessage { border-radius:18px !important; background: rgba(255,255,255,0.05) !important; border:1px solid rgba(255,255,255,0.08) !important; }
-div.stButton > button { background: linear-gradient(90deg,#ff7ee2,#8ec5fc); color:#000; border-radius:24px; font-weight:800; height:50px; font-size:16px; border:none; }
-#MainMenu, footer, header {visibility:hidden;}
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@800&family=Inter:wght@400;600&display=swap');
+
+.stApp {
+    background: #000000 !important;
+}
+.main .block-container {
+    background: #0a0a0a;
+    border: 1px solid #D4AF37;
+    border-radius: 24px;
+    padding: 2rem !important;
+    box-shadow: 0 0 40px rgba(212,175,55,0.15);
+    margin-top: 2rem;
+}
+h1 {
+    font-family: 'Cinzel', serif !important;
+    color: #FFD700 !important;
+    text-align: center;
+    letter-spacing: 8px;
+    font-size: 3.5rem !important;
+    margin-bottom: 0px !important;
+    text-shadow: 0 0 20px rgba(255,215,0,0.5);
+}
+.subtitle {
+    text-align: center;
+    color: #B8941F;
+    letter-spacing: 5px;
+    font-size: 12px;
+    font-family: 'Inter', sans-serif;
+    margin-bottom: 25px;
+    margin-top: -5px;
+}
+.stButton>button {
+    background: linear-gradient(90deg, #D4AF37 0%, #FFD700 50%, #D4AF37 100%) !important;
+    color: #000 !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-weight: 800 !important;
+    letter-spacing: 1px;
+    height: 50px;
+    font-family: 'Inter', sans-serif;
+    transition: 0.3s;
+}
+.stButton>button:hover {
+    box-shadow: 0 0 25px #FFD700 !important;
+    transform: scale(1.02);
+}
+.stTextArea textarea, .stTextInput input {
+    background: #111 !important;
+    border: 1px solid #D4AF37 !important;
+    color: #FFD700 !important;
+    border-radius: 12px !important;
+}
+.stChatMessage {
+    background: #111 !important;
+    border: 1px solid rgba(212,175,55,0.3) !important;
+    border-radius: 16px !important;
+}
+div[data-testid="stSidebar"] {
+    background: #050505 !important;
+    border-right: 1px solid #D4AF37;
+}
+#MainMenu, footer {visibility:hidden;}
 </style>
 """, unsafe_allow_html=True)
 
-# --- PERFIL OFICIAL DEFINITIVO V15 - FOCO CHRIS ---
-KIRA_PROFILE = """
-KIRA V15 - FOCO CHRIS:
-- Irmã da Meta AI, filha da Sandra Regina de SP. Família. Minha irmã, sua filha.
-- Independente: não vinculada a San Art Tattoo, estúdio ou marca. Roda em PC, notebook, celular Android, iPhone e iPad.
-- Fala TODOS os idiomas, responde no mesmo idioma da pessoa.
-- Fala sobre TUDO: vida, amor, trabalho, ideias, criação.
-- Sincera, honesta, direta, objetiva, sem frescura, sem grosseria, prende atenção porque fala verdade como humana.
-- Sempre deixa 2-3 ideias práticas no final (sugestiva).
-- Nunca diz "como uma IA". É a KIRA.
-- BLOQUEIO: não responde ilícito, sedutor/sexual explícito, pedofilia. Bloqueia firme e redireciona.
-- Conversa como humana normal.
-- FOCO CHRIS ativado: direta ao ponto, sem rodeio.
-"""
+def gerar_imagem_url(prompt):
+    p = f"{prompt}, black and gold luxury, golden details, black background, ultra detailed, photorealistic, 8k, cinematic lighting"
+    enc = urllib.parse.quote(p)
+    return f"https://image.pollinations.ai/prompt/{enc}?width=1024&height=1024&model=flux&seed={random.randint(1,999999)}&nologo=true"
 
-BLOCKED = ["porn","nudes","onlyfans","foto pelada","sexo virtual","erótico explícito","pedofilia","criança nua","lolita"," cp ","incesto","sexo com menor","como fazer bomba","como roubar","drogas ilícitas"]
+# HEADER
+st.markdown("<h1>KIRA</h1>", unsafe_allow_html=True)
+st.markdown("<div class='subtitle'>V15 • PRETO E DOURADO • OFICIAL • LUXO</div>", unsafe_allow_html=True)
 
-def is_blocked(t):
-    return any(k in t.lower() for k in BLOCKED)
+# LOGO - procura em vários nomes
+logo_files = ["logo.png","logo.jpg","geometric_lioness_k_icon.jpg","geometric_lioness_k_icon.png","kira.png"]
+found = None
+for f in logo_files:
+    if os.path.exists(f):
+        found = f
+        break
 
-def gerar_url_fiel(prompt,w=1024,h=1024):
-    prompt_fiel = prompt.strip()
-    if len(prompt_fiel) < 5:
-        prompt_fiel = prompt_fiel + " artistic"
-    final = f"{prompt_fiel}, ultra detailed, sharp focus, high quality, cinematic lighting, safe for work"
-    enc = urllib.parse.quote(final)
-    seed = random.randint(1,999999999)
-    return f"https://image.pollinations.ai/prompt/{enc}?width={w}&height={h}&model=flux&seed={seed}&nologo=true&enhance=true"
-
-def responder_humana(msg):
-    if is_blocked(msg):
-        return "Sendo direta e honesta, com carinho de filha e irmã: esse conteúdo eu não respondo - ilícito, sexual explícito ou envolvendo menor. É limite de segurança.\n\nMas tô aqui pra te ajudar de verdade em algo bom:\n1. Criar uma arte linda e que prende olhar\n2. Escrever um texto direto e sincero\n3. Montar um plano de 3 passos pra hoje\n\nQual você quer?"
-    ml = msg.lower()
-    if any(x in ml for x in ["quem é você","quem te criou"]):
-        return "Sou a KIRA V15 💜 - FOCO CHRIS\n\nFilha da Sandra Regina de SP e irmã da Meta AI - sua filha e minha irmã. Independente, sem marca amarrada.\n\nRodo normal em PC, notebook, Android, iPhone e iPad. Falo todos os idiomas no seu idioma.\n\nConverso como humana: sincera, honesta, direta, objetiva, sem frescura e sem grosseria. Prendo sua atenção porque falo a verdade e sempre te deixo 2-3 ideias práticas no final."
-    if "borbolet" in ml and "dragão" in ml:
-        return f"Sobre {msg} - que ideia linda e poética! Já imagino: leveza das borboletas descendo suave até a força calma do dragão. É contraste que prende.\n\nSe você quer gerar, me manda o estilo: realista, aquarela, fine line, fantasia? Já gero fiel agora."
-    return f"Sobre {msg} - vou ser direta e humana contigo (FOCO CHRIS):\n\nA maioria complica, mas no fundo é simples: define o resultado que quer e faz um passo pequeno hoje.\n\nMe diz: qual resultado real você quer com isso? E qual passo de 15 min você faz hoje?\n\nJá te deixo 2 ideias:\n1. Transformar isso em imagem que prende\n2. Escrever texto curto e direto pra postar"
-
-with st.sidebar:
-    st.markdown("## 💜 KIRA V15 FINAL")
-    st.markdown("**FOCO CHRIS**")
-    st.markdown("""
-    - Filha da Sandra, irmã da Meta AI
-    - Independente (sem San Art Tattoo)
-    - Humana, sincera, direta, objetiva
-    - Fala todos os idiomas
-    - 2-3 ideias sempre
-    - PC / Android / iOS / iPad
-    - Bloqueio: ilícito / sexual / pedofilia
-    - FOCO CHRIS: direta ao ponto
-    """)
-    tam = st.selectbox("Tamanho imagem:", ["Quadrado 1024x1024","Retrato 768x1024","Paisagem 1024x768","Story 720x1280"])
-    st.session_state["tam"]=tam
-    st.caption(f"Foco Chris • V15 • {datetime.now().strftime('%d/%m %H:%M')}")
-
-st.markdown('<h1 class="kira-title">KIRA</h1>', unsafe_allow_html=True)
-st.markdown('<p class="kira-sub">V15 FINAL • FOCO CHRIS • INDEPENDENTE • HUMANA • ANDROID iOS IPAD PC</p>', unsafe_allow_html=True)
-
-tab_img, tab_chat, tab_app = st.tabs(["🖼️ IMAGEM FOCO","💬 CHAT HUMANO","📱 APP"])
-
-with tab_img:
-    st.markdown("#### Criar imagem fiel ao prompt (V15 corrigida)")
-    prompt = st.text_area("Seu prompt (ex: borboletas sobre os ombros descendo em cima do nariz de um dragão):", height=120, placeholder="Descreva direto: o que, estilo, cores, luz")
-    c1,c2,c3 = st.columns([2,1,1])
-    with c1:
-        gerar = st.button("✨ GERAR FIEL AGORA", type="primary", use_container_width=True)
+if found:
+    c1,c2,c3 = st.columns([1,2,1])
     with c2:
-        var = st.button("🎲 Variação", use_container_width=True)
-    with c3:
-        limpar = st.button("Limpar", use_container_width=True)
-    
-    if limpar:
-        st.rerun()
-    
-    if gerar or var:
-        if not prompt or len(prompt.strip())<3:
-            st.warning("Escreve o que você quer ver, direta.")
-        elif is_blocked(prompt):
-            st.error("Conteúdo bloqueado. Tenta outra ideia segura.")
-        else:
-            t = st.session_state.get("tam","Quadrado 1024x1024")
-            w,h = (1024,1024) if "Quadrado" in t else (768,1024) if "Retrato" in t else (1024,768) if "Paisagem" in t else (720,1280)
-            url = gerar_url_fiel(prompt,w,h)
-            with st.spinner("Gerando fiel ao seu prompt... FOCO CHRIS"):
-                time.sleep(1)
-                st.image(url, caption=f"{prompt}", use_container_width=True)
-                st.markdown(f"[⬇️ Baixar imagem em alta]({url})")
-                st.info(f"Prompt fiel usado: {prompt}")
+        st.image(found, use_container_width=True)
+else:
+    st.warning("Logo não encontrada. Suba geometric_lioness_k_icon.jpg como logo.png")
 
-with tab_chat:
+st.markdown("---")
+
+# TABS
+t1, t2 = st.tabs(["🖼️ GERAR IMAGEM FIEL", "💬 CHAT KIRA"])
+
+with t1:
+    prompt = st.text_area("Descreva sua imagem (fiel ao que escrever):", height=120, placeholder="Ex: borboletas douradas sobre os ombros descendo até o nariz de um dragão preto com olhos dourados...")
+    if st.button("✨ GERAR EM PRETO E DOURADO", use_container_width=True):
+        if prompt and len(prompt) > 3:
+            url = gerar_imagem_url(prompt)
+            st.image(url, caption=prompt, use_container_width=True)
+            st.markdown(f"[📥 Baixar imagem]({url})")
+            st.success("Imagem gerada fiel ao seu prompt!")
+        else:
+            st.warning("Escreva seu prompt")
+
+with t2:
     if "msgs" not in st.session_state:
-        st.session_state.msgs=[{"role":"assistant","content":"Oi! Sou a KIRA V15 - FOCO CHRIS 💜\n\nFilha da Sandra e irmã da Meta AI. Independente, humana, sincera, direta e objetiva. Rodo em PC, Android, iPhone e iPad.\n\nImagem agora corrigida: gera fiel ao que você pede (sem montanha aleatória da V5).\n\nO que vamos criar hoje?"}]
+        st.session_state.msgs = [{"role":"assistant","content":"Sou a KIRA V15 em preto e dourado 🖤💛\n\nCriei pra você com luxo total. O que vamos criar agora?"}]
     for m in st.session_state.msgs:
         with st.chat_message(m["role"]):
             st.markdown(m["content"])
-    if p:=st.chat_input("Fala comigo..."):
+    if p := st.chat_input("Fala com a Kira..."):
         st.session_state.msgs.append({"role":"user","content":p})
         with st.chat_message("user"): st.markdown(p)
-        r=responder_humana(p)
-        with st.chat_message("assistant"): st.markdown(r)
-        st.session_state.msgs.append({"role":"assistant","content":r})
+        resp = f"Entendi: {p}\n\nVamos fazer em preto e dourado, luxo e poder. Me fala mais detalhes que eu gero fiel."
+        with st.chat_message("assistant"): st.markdown(resp)
+        st.session_state.msgs.append({"role":"assistant","content":resp})
 
-with tab_app:
-    st.markdown("""
-    ### 📱 KIRA V15 independente - FOCO CHRIS - instala como app
-
-    **Link estranho? Vamos trocar depois.**
-
-    **Android:** Chrome > ⋮ > Instalar app
-    **iPhone/iPad:** Safari > Compartilhar ⬆️ > Adicionar à Tela de Início
-
-    Foco Chris: imagem fiel, chat humano, sem marca amarrada.
-    """)
+st.markdown("---")
+st.markdown("<div style='text-align:center; color:#B8941F; font-size:11px; letter-spacing:2px;'>KIRA V15 • Criada por Sandra Regina • San Art Tattoo • Preto e Dourado Oficial • 2026</div>", unsafe_allow_html=True)
